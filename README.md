@@ -49,7 +49,7 @@ The three-scene split (`Boot → Preload → Game`) is the same pattern used in 
 ## Gameplay
 
 - 5 pairs, 60-second timer
-- Match all pairs to win — best time is saved to `localStorage` and shown next to the running timer
+- Match all pairs to win - best time is saved to `localStorage` and shown next to the running timer
 
 ## What I learned
 

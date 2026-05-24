@@ -18,10 +18,34 @@ class GameScene extends Phaser.Scene {
         this.load.audio('timeout', 'assets/sounds/timeout.mp3');
     }
     createText() {
-        this.timeoutText = this.add.text(10, 330, "", {
+        this.timeoutText = this.add.text(config.paddingX, 20, "", {
             font: '36px CurseCasual',
             fill: '#ffffff'
         });
+        this.bestTimeText = this.add.text(config.paddingX + 260, 20, "", {
+            font: '36px CurseCasual',
+            fill: '#ffd700'
+        });
+        this.updateBestTimeText();
+    }
+    updateBestTimeText() {
+        const best = this.getBestTime();
+        if (best !== null) {
+            this.bestTimeText.setText("Best: " + best + "s");
+        } else {
+            this.bestTimeText.setText("Best: -");
+        }
+    }
+    getBestTime() {
+        const value = localStorage.getItem('memoryCards.bestTime');
+        return value === null ? null : parseInt(value, 10);
+    }
+    saveBestTime(seconds) {
+        const best = this.getBestTime();
+        if (best === null || seconds < best) {
+            localStorage.setItem('memoryCards.bestTime', String(seconds));
+            this.updateBestTimeText();
+        }
     }
     onTimerTick() {
         this.timeoutText.setText("Time: " + this.timeout);
@@ -128,6 +152,8 @@ class GameScene extends Phaser.Scene {
 
         if (this.openedCardsCount === this.cards.length / 2) {
             this.sounds.complete.play();
+            const elapsed = config.timeout - this.timeout;
+            this.saveBestTime(elapsed);
             this.start();
         }
     }
@@ -135,8 +161,10 @@ class GameScene extends Phaser.Scene {
         let positions = [];
         let cardWidth = config.cardWidth + 20;
         let cardHeight = config.cardHeight + 20;
-        let offsetX = (this.sys.game.config.width - cardWidth * config.cols) / 2 + cardWidth / 2;
-        let offsetY = (this.sys.game.config.height - cardHeight * config.rows) / 2 + cardHeight / 2;
+        let availableWidth = this.sys.game.config.width - 2 * config.paddingX;
+        let availableHeight = this.sys.game.config.height - config.paddingTop - config.paddingBottom;
+        let offsetX = config.paddingX + (availableWidth - cardWidth * config.cols) / 2 + cardWidth / 2;
+        let offsetY = config.paddingTop + (availableHeight - cardHeight * config.rows) / 2 + cardHeight / 2;
 
         let id = 0;
         for (let row = 0; row < config.rows; row++) {

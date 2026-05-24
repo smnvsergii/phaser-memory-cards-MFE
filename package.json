@@ -4,7 +4,7 @@
   "description": "A small memory match game built with Phaser 3 — first step toward learning game development.",
   "private": true,
   "scripts": {
-    "start": "npx http-server -p 8000 -c-1 -o",
+    "start": "npx http-server -p 8001 -c-1 -o",
     "start:python": "python3 -m http.server 8000"
   },
   "keywords": ["phaser", "game", "memory"],

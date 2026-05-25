@@ -1,8 +1,8 @@
 /**
- * GameScene — основная игровая сцена. Отвечает за геймплей:
- * раскладка карт, обработка кликов, таймер, рекорды.
+ * GameScene is the main game scene. It's responsible for gameplay:
+ * card layout, click processing, timer, and high scores.
  *
- * Загрузка ассетов вынесена в PreloadScene, поэтому здесь — только логика.
+ * Asset loading is handled in PreloadScene, so it's all about logic.
  */
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -104,12 +104,12 @@ class GameScene extends Phaser.Scene {
 
         if (this.openedCard) {
             if (this.openedCard.value === card.value) {
-                // совпадение
+                // coincidence
                 this.sounds.success.play();
                 this.openedCard = null;
                 ++this.openedCardsCount;
             } else {
-                // не совпало — закрываем предыдущую
+                // if it doesn't match, we'll close the previous one.
                 this.openedCard.close();
                 this.openedCard = card;
             }

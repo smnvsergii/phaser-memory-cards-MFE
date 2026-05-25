@@ -1,7 +1,7 @@
 /**
- * Card — игровой объект карточки.
- * Расширяет Phaser.GameObjects.Sprite и инкапсулирует анимации
- * передвижения и переворота, а также состояние «открыта/закрыта».
+ * Card is a card game object.
+ * Extends Phaser.GameObjects.Sprite and encapsulates animations
+ * for movement and flipping, as well as the open/closed state.
  */
 class Card extends Phaser.GameObjects.Sprite {
     constructor(scene, value) {
@@ -17,7 +17,7 @@ class Card extends Phaser.GameObjects.Sprite {
     init(position) {
         this.position = position;
         this.close();
-        // ставим карту за пределы экрана для эффекта влёта
+        // We place the map outside the screen for the effect of flying in
         this.setPosition(-this.displayWidth, -this.displayHeight);
     }
 
@@ -45,7 +45,7 @@ class Card extends Phaser.GameObjects.Sprite {
     show() {
         const texture = this.opened ? 'card' + this.value : 'card';
         this.setTexture(texture);
-        // важно: разные текстуры разного размера, поэтому перенормируем
+        // Important: different textures are of different sizes, so we will renormalize
         this.setDisplaySize(GameConfig.cardWidth, GameConfig.cardHeight);
         const targetScaleX = this.scaleX;
         this.scaleX = 0;

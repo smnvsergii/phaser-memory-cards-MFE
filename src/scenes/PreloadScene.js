@@ -1,7 +1,6 @@
 /**
- * PreloadScene — отвечает за загрузку всех игровых ассетов и показывает
- * прогресс-бар. Геймплейные сцены не должны грузить ассеты сами,
- * чтобы старт игры был мгновенным.
+ * PreloadScene — is responsible for loading all game assets and displays a progress bar.
+ * Gameplay scenes should not load assets themselves, so that the game starts instantly.
  */
 class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -11,14 +10,14 @@ class PreloadScene extends Phaser.Scene {
     preload() {
         this.createProgressBar();
 
-        // Спрайты
+        // sprites
         this.load.image('bg', 'assets/sprites/background.webp');
         this.load.image('card', 'assets/sprites/card.webp');
         for (const value of GameConfig.cards) {
             this.load.image('card' + value, `assets/sprites/card${value}.webp`);
         }
 
-        // Звуки
+        // sounds
         this.load.audio('card', 'assets/sounds/card.mp3');
         this.load.audio('complete', 'assets/sounds/complete.mp3');
         this.load.audio('success', 'assets/sounds/success.mp3');

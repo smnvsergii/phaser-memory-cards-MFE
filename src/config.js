@@ -1,28 +1,24 @@
-/**
- * Игровая конфигурация и константы.
- * Все магические числа собраны здесь, чтобы менять их в одном месте.
- */
 const GameConfig = {
-    // Размер канваса
+    // Canvas
     width: 1280,
     height: 720,
 
-    // Сетка карт
+    // Grid of cards
     rows: 2,
     cols: 5,
     cards: [1, 2, 3, 4, 5],
 
-    // Размер одной карты при отображении
+    // one card size
     cardWidth: 240,
     cardHeight: 140,
     cardGap: 20,
 
-    // Отступы вокруг игрового поля
+    // game space
     paddingX: 40,
     paddingTop: 80,
     paddingBottom: 40,
 
-    // Таймер раунда (секунды)
+    // round timer sec
     timeout: 60,
 
     // UI
@@ -34,18 +30,15 @@ const GameConfig = {
         bestTimeOffsetX: 260,
     },
 
-    // Хранилище
     storage: {
         bestTimeKey: 'memoryCards.bestTime',
     },
 
-    // Анимации
     animation: {
         cardMoveDuration: 250,
         cardFlipDuration: 150,
         cardMoveStaggerDelay: 100,
     },
 
-    // Громкость темы
     themeVolume: 0.1,
 };

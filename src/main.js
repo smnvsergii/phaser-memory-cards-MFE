@@ -1,6 +1,6 @@
 /**
- * Точка входа. Создаёт инстанс игры, регистрирует все сцены
- * и стартует с BootScene.
+ * Entry point. Creates a game instance and registers all scenes.
+ * and starts from BootScene.
  */
 const game = new Phaser.Game({
     type: Phaser.AUTO,

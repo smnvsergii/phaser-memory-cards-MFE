@@ -1,9 +1,9 @@
 /**
- * BootScene — первая сцена. Грузит минимум, нужный для лоадера
- * (например, ассеты прогресс-бара), и сразу передаёт управление PreloadScene.
+ * BootScene is the first scene. Loads the minimum required for the loader.
+ * (for example, progress bar assets), and immediately transfers control to PreloadScene.
  *
- * В реальных играх здесь обычно: подгрузка манифеста ассетов, инициализация
- * аналитики, запрос конфигурации с сервера.
+ * In real games this is usually: loading asset manifest, initialization
+ * analytics, requesting configuration from the server.
  */
 class BootScene extends Phaser.Scene {
     constructor() {
@@ -11,8 +11,8 @@ class BootScene extends Phaser.Scene {
     }
 
     preload() {
-        // Тут можно подгрузить лого/фон лоадера, если они есть.
-        // Сейчас обходимся без отдельных ассетов лоадера.
+        // Here you can upload the loader logo/background, if any.
+        // Now we can do without separate loader assets.
     }
 
     create() {

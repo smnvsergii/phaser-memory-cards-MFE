@@ -3,6 +3,11 @@
  * card layout, click processing, timer, and high scores.
  *
  * Asset loading is handled in PreloadScene, so it's all about logic.
+ *
+ * Shell integration:
+ *   - Emits domain events (gameStart, match, mismatch, win, timeout,
+ *     bestTimeUpdated) via the MFE bridge.
+ *   - Subscribes to commands (pause, resume, restart, mute, setVolume).
  */
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -10,13 +15,28 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.bridge = this.registry.get('mfeBridge');
+        this.unsubscribers = [];
+
         this.timeout = GameConfig.timeout;
         this.createSounds();
         this.createTimer();
         this.createBackground();
         this.createText();
         this.createCards();
+
+        // Bind commands and announce ready BEFORE the first gameStart,
+        // so the shell receives events in a meaningful order:
+        //   ready -> gameStart -> ...
+        this.bindShellCommands();
+        this.bridge.ready({
+            bestTime: this.getBestTime(),
+            timeout: GameConfig.timeout,
+        });
+
         this.start();
+
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.onShutdown, this);
     }
 
     // --- Setup ---
@@ -70,6 +90,48 @@ class GameScene extends Phaser.Scene {
         this.input.on('gameobjectdown', this.onCardClicked, this);
     }
 
+    // --- Shell command bindings ---
+
+    bindShellCommands() {
+        const sub = (type, fn) => this.unsubscribers.push(this.bridge.on(type, fn));
+
+        sub('pause', () => {
+            if (!this.scene.isPaused()) {
+                this.scene.pause();
+                this.sounds.theme.pause();
+                this.bridge.emit('paused');
+            }
+        });
+
+        sub('resume', () => {
+            if (this.scene.isPaused()) {
+                this.scene.resume();
+                this.sounds.theme.resume();
+                this.bridge.emit('resumed');
+            }
+        });
+
+        sub('restart', () => {
+            this.start();
+        });
+
+        sub('mute', ({ muted } = {}) => {
+            this.sound.mute = Boolean(muted);
+            this.bridge.emit('muteChanged', { muted: this.sound.mute });
+        });
+
+        sub('setVolume', ({ volume } = {}) => {
+            const v = Math.max(0, Math.min(1, Number(volume)));
+            this.sound.volume = v;
+            this.bridge.emit('volumeChanged', { volume: v });
+        });
+    }
+
+    onShutdown() {
+        for (const off of this.unsubscribers) off();
+        this.unsubscribers = [];
+    }
+
     // --- Game flow ---
 
     start() {
@@ -78,6 +140,9 @@ class GameScene extends Phaser.Scene {
         this.openedCardsCount = 0;
         this.initCards();
         this.showCards();
+        if (this.bridge) {
+            this.bridge.emit('gameStart', { timeout: GameConfig.timeout });
+        }
     }
 
     initCards() {
@@ -106,10 +171,18 @@ class GameScene extends Phaser.Scene {
             if (this.openedCard.value === card.value) {
                 // coincidence
                 this.sounds.success.play();
+                this.bridge.emit('match', {
+                    value: card.value,
+                    matched: this.openedCardsCount + 1,
+                    total: this.cards.length / 2,
+                });
                 this.openedCard = null;
                 ++this.openedCardsCount;
             } else {
                 // if it doesn't match, we'll close the previous one.
+                this.bridge.emit('mismatch', {
+                    values: [this.openedCard.value, card.value],
+                });
                 this.openedCard.close();
                 this.openedCard = card;
             }
@@ -122,6 +195,7 @@ class GameScene extends Phaser.Scene {
         if (this.openedCardsCount === this.cards.length / 2) {
             this.sounds.complete.play();
             const elapsed = GameConfig.timeout - this.timeout;
+            this.bridge.emit('win', { time: elapsed });
             this.saveBestTime(elapsed);
             this.start();
         }
@@ -131,6 +205,7 @@ class GameScene extends Phaser.Scene {
         this.timeoutText.setText('Time: ' + this.timeout);
         if (this.timeout <= 0) {
             this.sounds.timeout.play();
+            this.bridge.emit('timeout');
             this.start();
         } else {
             --this.timeout;
@@ -177,6 +252,7 @@ class GameScene extends Phaser.Scene {
         if (best === null || seconds < best) {
             localStorage.setItem(GameConfig.storage.bestTimeKey, String(seconds));
             this.updateBestTimeText();
+            this.bridge.emit('bestTimeUpdated', { bestTime: seconds });
         }
     }
 

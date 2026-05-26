@@ -41,4 +41,13 @@ const GameConfig = {
     },
 
     themeVolume: 0.1,
+
+    // MFE / shell integration
+    mfe: {
+        id: 'memory-cards',
+        protocolVersion: 1,
+        // Whitelist of shell origins. Empty = accept any (dev only).
+        // Example for production: ['https://shell.example.com']
+        allowedShellOrigins: [],
+    },
 };

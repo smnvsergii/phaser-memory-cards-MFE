@@ -61,11 +61,64 @@ The three-scene split (`Boot → Preload → Game`) is the same pattern used in 
 
 ## Roadmap
 
+- [x] Wrap as a microfrontend embedded into a shell app via iframe + `postMessage`
 - [ ] Migrate to Vite + ES modules
 - [ ] Add TypeScript
 - [ ] Replace globals with `import` / `export`
-- [ ] Wrap as a microfrontend embedded into a shell app via iframe + `postMessage`
 - [ ] Move on to a slot prototype using the same architecture
+
+## MFE / shell integration
+
+The game can run standalone (open `index.html` directly) or embedded in a
+shell application via `<iframe>`. Communication uses `window.postMessage`
+through a thin wrapper, `MFEBridge` (`src/mfe/bridge.js`).
+
+### Message envelope
+
+```js
+const message = {
+  source:  'memory-cards', // sender id
+  target:  'memory-cards', // optional; used by shell to address one MFE
+  version: 1,              // protocol version
+  type:    'win',          // event/command name
+  payload: { time: 42 },
+};
+```
+
+`target` is optional. The shell omits it for broadcasts and sets it to a
+specific MFE id when addressing one game.
+
+### Commands (shell → MFE)
+
+| type        | payload               | effect                          |
+|-------------|-----------------------|---------------------------------|
+| `pause`     | —                     | pauses the active scene & theme |
+| `resume`    | —                     | resumes the active scene        |
+| `restart`   | —                     | restarts the round              |
+| `mute`      | `{ muted: boolean }`  | toggles all sounds              |
+| `setVolume` | `{ volume: 0..1 }`    | sets master volume              |
+
+### Events (MFE → shell)
+
+| type              | payload                                      |
+|-------------------|----------------------------------------------|
+| `ready`           | `{ mfeId, version, bestTime, timeout }`      |
+| `gameStart`       | `{ timeout }`                                |
+| `match`           | `{ value, matched, total }`                  |
+| `mismatch`        | `{ values: [a, b] }`                         |
+| `win`             | `{ time }`                                   |
+| `timeout`         | —                                            |
+| `bestTimeUpdated` | `{ bestTime }`                               |
+| `paused`          | —                                            |
+| `resumed`         | —                                            |
+| `muteChanged`     | `{ muted }`                                  |
+| `volumeChanged`   | `{ volume }`                                 |
+
+### Origin policy
+
+Configure allowed shell origins in `src/config.js` under `mfe.allowedShellOrigins`.
+An empty list (the default) accepts any origin and logs a warning — convenient
+for local dev, never for production.
 
 ## Notes
 

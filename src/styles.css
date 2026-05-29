@@ -1,3 +1,19 @@
+/* Cinzel — primary game font (bundled locally via @fontsource). */
+@import '@fontsource/cinzel/400.css';
+@import '@fontsource/cinzel/600.css';
+@import '@fontsource/cinzel/700.css';
+@import '@fontsource/cinzel-decorative/700.css';
+
+:root {
+    --gold-1: #fff4b8;
+    --gold-2: #ffcf5c;
+    --gold-3: #b86b00;
+    --purple-1: #8f2cff;
+    --purple-2: #5a0fb7;
+    --purple-3: #2b063f;
+    --white-warm: #fff7df;
+}
+
 html,
 body {
     padding: 0;
@@ -12,17 +28,14 @@ canvas {
     display: block;
 }
 
-@font-face {
-    font-family: 'CurseCasual';
-    src: url('/assets/fonts/CurseCasual.ttf') format('truetype');
-    font-display: block;
-}
-
-/* Off-screen element forces the browser to load the font before Phaser
-   creates text objects with it. */
+/* Off-screen element forces the browser to load the fonts before Phaser
+   creates text objects with them. */
 .font-preload {
-    font-family: 'CurseCasual', sans-serif;
     position: absolute;
-    left: -100px;
-    top: -100px;
+    left: -1000px;
+    top: -1000px;
+    font-family: 'Cinzel', serif;
+}
+.font-preload .decorative {
+    font-family: 'Cinzel Decorative', serif;
 }

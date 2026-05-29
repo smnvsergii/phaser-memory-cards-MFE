@@ -11,6 +11,11 @@ import { GameScene } from './scenes/GameScene';
  * Entry point. Builds the MFE bridge first so it can already listen for
  * messages while Phaser bootstraps, then creates the game and exposes the
  * bridge through the registry.
+ *
+ * Scale strategy: `RESIZE` lets the canvas fill its parent and forwards
+ * resize events to the active scene. The scene listens for those events
+ * and recomputes the grid for the current viewport — that's how the
+ * 4 / 3 / 2 column adaptation works.
  */
 const mfeBridge = new MFEBridge({
     mfeId: GameConfig.mfe.id,
@@ -22,9 +27,16 @@ mfeBridge.init();
 const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
-    backgroundColor: '#000000',
+    backgroundColor: '#0a0612',
+    // Use linear filtering and DPR-aware rendering for crisp visuals.
+    render: {
+        antialias: true,
+        antialiasGL: true,
+        pixelArt: false,
+        roundPixels: false,
+    },
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: GameConfig.width,
         height: GameConfig.height,

@@ -1,10 +1,15 @@
 import Phaser from 'phaser';
-import { GameConfig } from '../config';
+import { CARD_KEYS, GameConfig } from '../config';
 
 /**
  * PreloadScene loads all gameplay assets and shows a progress bar.
  * Game scenes should never load assets themselves so the round starts
  * without hiccups.
+ *
+ * Texture key naming:
+ *   bg           — lobby background
+ *   card-back    — face-down card art
+ *   card-<id>    — face-up card art (one per CARD_KEYS entry)
  */
 export class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -14,14 +19,13 @@ export class PreloadScene extends Phaser.Scene {
     preload(): void {
         this.createProgressBar();
 
-        // sprites
-        this.load.image('bg', 'assets/sprites/background.webp');
-        this.load.image('card', 'assets/sprites/card.webp');
-        for (const value of GameConfig.cards) {
-            this.load.image(`card${value}`, `assets/sprites/card${value}.webp`);
+        this.load.image('bg', 'assets/sprites/background-lobby.webp');
+        this.load.image('background-win', 'assets/sprites/background-win.webp');
+        this.load.image('card-back', 'assets/sprites/card-back.webp');
+        for (const key of CARD_KEYS) {
+            this.load.image(`card-${key}`, `assets/sprites/card-${key}.webp`);
         }
 
-        // sounds
         this.load.audio('card', 'assets/sounds/card.mp3');
         this.load.audio('complete', 'assets/sounds/complete.mp3');
         this.load.audio('success', 'assets/sounds/success.mp3');
@@ -35,7 +39,7 @@ export class PreloadScene extends Phaser.Scene {
 
     private createProgressBar(): void {
         const { width, height } = this.sys.game.scale.gameSize;
-        const barWidth = 400;
+        const barWidth = Math.min(400, width * 0.6);
         const barHeight = 24;
         const x = (width - barWidth) / 2;
         const y = (height - barHeight) / 2;
@@ -47,7 +51,7 @@ export class PreloadScene extends Phaser.Scene {
         const fill = this.add.graphics();
         const label = this.add
             .text(width / 2, y - 30, 'Loading...', {
-                font: '24px monospace',
+                font: GameConfig.ui.hudLabelFont,
                 color: '#ffffff',
             })
             .setOrigin(0.5);
